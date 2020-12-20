@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from vlapi.models import Article, Category
+from vlapi.models import Article, Category, Image
 
 
 @admin.register(Article)
@@ -11,4 +11,9 @@ class ArticleAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Image)
+class ImageAdmin(admin.ModelAdmin):
     pass
