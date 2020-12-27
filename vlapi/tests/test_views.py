@@ -68,13 +68,14 @@ class TestArticlesView:
 
     @pytest.mark.usefixtures(
         'culture_article', 'newest_culture_article', 'pixels_article', 'newest_pixels_article')
-    def test_returns_articles_grouped_by_category(self, client, settings):
+    def test_returns_articles_grouped_by_category(self, client, settings, django_assert_num_queries):
         settings.LIST_ARTICLES_BY_CATEGORY = {
             'culture': 2,
             'pixels': 1,
             'interviews': 3,
         }
-        response = client.get('/categories/')
+        with django_assert_num_queries(4):
+            response = client.get('/categories/')
 
         assert response.status_code == 200
         assert response.json() == {
@@ -110,8 +111,9 @@ class TestArticlesView:
         }
 
     @pytest.mark.usefixtures('culture_article', 'pixels_article', 'newest_culture_article')
-    def test_returns_articles_for_a_category(self, client):
-        response = client.get('/categories/culture/')
+    def test_returns_articles_for_a_category(self, client, django_assert_num_queries):
+        with django_assert_num_queries(2):
+            response = client.get('/categories/culture/')
 
         assert response.status_code == 200
         assert response.json() == [

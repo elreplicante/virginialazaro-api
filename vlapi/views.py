@@ -12,7 +12,7 @@ class CategoriesViewSet(viewsets.ViewSet):
         categories = Category.objects.all()
         payload = {
             category.name: ArticleSerializer(
-                category.articles.publication_descending()[:settings.LIST_ARTICLES_BY_CATEGORY[category.name]],
+                category.articles.select_related('image').for_homepage(category.name),
                 many=True
             ).data
             for category in categories
@@ -22,7 +22,8 @@ class CategoriesViewSet(viewsets.ViewSet):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(name=kwargs['name'])
-        payload = ArticleSerializer(category.articles.publication_descending(), many=True).data
+        articles = category.articles.select_related('image').publication_descending()
+        payload = ArticleSerializer(articles, many=True).data
 
         return Response(payload)
 
