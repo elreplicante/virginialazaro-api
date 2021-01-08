@@ -118,11 +118,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
-)
+try:
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+    )
+except ModuleNotFoundError:
+    pass
 
 LIST_ARTICLES_BY_CATEGORY = {
     'culture': 3,
