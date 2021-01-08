@@ -1,11 +1,8 @@
 import os
 from pathlib import Path
-import django_heroku
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'a-secret-key')
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
@@ -118,11 +115,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
-)
+try:
+    import django_heroku
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+    )
+    django_heroku.settings(locals())
+except ModuleNotFoundError:
+    pass
 
 LIST_ARTICLES_BY_CATEGORY = {
     'culture': 3,
@@ -130,4 +134,4 @@ LIST_ARTICLES_BY_CATEGORY = {
     'interviews': 2,
 }
 
-django_heroku.settings(locals())
+
