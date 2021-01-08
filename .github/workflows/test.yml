@@ -21,4 +21,4 @@ jobs:
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
       run: |
-        pytest -vv
+        DJANGO_SETTINGS_MODULE=virginialazaro.settings pytest -vv
