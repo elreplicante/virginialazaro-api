@@ -38,3 +38,6 @@ class Image(models.Model):
     class Meta:
         db_table = 'images'
         verbose_name_plural = 'Images'
+
+    def __str__(self):
+        return f'{self.url}'
