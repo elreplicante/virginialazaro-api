@@ -1,13 +1,19 @@
 import pytest
 
-from vlapi.models import Article, Category, Image
+from vlapi.models import Article, Category, Image, Language
 
 
 @pytest.fixture
-def culture_article():
+def spanish():
+    return Language.objects.get(name='es')
+
+
+@pytest.fixture
+def culture_article(spanish):
     image = Image.objects.create(url='http://culture-image.url')
     category = Category.objects.get(name='culture')
     return Article.objects.create(
+        language=spanish,
         title='Culture Article',
         excerpt='The excerpt',
         media_title='The link title',
@@ -19,10 +25,11 @@ def culture_article():
 
 
 @pytest.fixture
-def newest_culture_article():
+def newest_culture_article(spanish):
     image = Image.objects.create(url='http://newest-culture-image.url')
     category = Category.objects.get(name='culture')
     return Article.objects.create(
+        language=spanish,
         title='Newest Culture Article',
         excerpt='The excerpt',
         media_title='The link title',
@@ -34,10 +41,11 @@ def newest_culture_article():
 
 
 @pytest.fixture
-def pixels_article():
+def pixels_article(spanish):
     category = Category.objects.get(name='pixels')
     image = Image.objects.create(url='http://pixels-image.url')
     return Article.objects.create(
+        language=spanish,
         title='Pixels Article',
         excerpt='The excerpt',
         media_title='The link title',
@@ -49,10 +57,11 @@ def pixels_article():
 
 
 @pytest.fixture
-def newest_pixels_article():
+def newest_pixels_article(spanish):
     image = Image.objects.create(url='http://newest-pixels-image.url')
     category = Category.objects.get(name='pixels')
     return Article.objects.create(
+        language=spanish,
         title='Newest Pixels Article',
         excerpt='The excerpt',
         media_title='The link title',

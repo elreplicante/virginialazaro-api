@@ -11,6 +11,8 @@ class Article(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='articles')
     publication_date = models.DateField()
     image = models.OneToOneField('Image', on_delete=models.PROTECT)
+    language = models.ForeignKey(
+        'Language', to_field='name', on_delete=models.CASCADE, related_name='articles')
 
     objects = ArticleQuerySet.as_manager()
 
@@ -41,3 +43,10 @@ class Image(models.Model):
 
     def __str__(self):
         return f'{self.url}'
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=2, unique=True)
+
+    def __str__(self):
+        return f'{self.name}'

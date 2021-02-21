@@ -8,4 +8,4 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        exclude = ['id', 'category', 'image']
+        exclude = ['id', 'category', 'image', 'language']
