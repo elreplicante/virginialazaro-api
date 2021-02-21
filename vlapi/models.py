@@ -40,4 +40,4 @@ class Image(models.Model):
         verbose_name_plural = 'Images'
 
     def __str__(self):
-        return f'{self.article.title} {self.url}'
+        return f'{self.url}'
