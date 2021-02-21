@@ -6,7 +6,7 @@ from vlapi.models import Article, Category, Image
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ['title', 'media_title', 'category', 'publication_date']
-    list_filter = ['category', 'media_title']
+    list_filter = ['category', 'language']
 
 
 @admin.register(Category)
