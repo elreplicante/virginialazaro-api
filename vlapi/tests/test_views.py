@@ -9,12 +9,33 @@ def spanish():
 
 
 @pytest.fixture
-def culture_article(spanish):
+def english():
+    return Language.objects.get(name='en')
+
+
+@pytest.fixture
+def spanish_culture_article(spanish):
     image = Image.objects.create(url='http://culture-image.url')
     category = Category.objects.get(name='culture')
     return Article.objects.create(
         language=spanish,
-        title='Culture Article',
+        title='Artículo de cultura',
+        excerpt='El extracto',
+        media_title='El título del link',
+        media_link='http://link.titulo',
+        category=category,
+        publication_date='2020-12-13',
+        image=image,
+    )
+
+
+@pytest.fixture
+def english_culture_article(english):
+    image = Image.objects.create(url='http://culture-image.url')
+    category = Category.objects.get(name='culture')
+    return Article.objects.create(
+        language=english,
+        title='Culture article',
         excerpt='The excerpt',
         media_title='The link title',
         media_link='http://link.title',
@@ -25,15 +46,15 @@ def culture_article(spanish):
 
 
 @pytest.fixture
-def newest_culture_article(spanish):
+def newest_spanish_culture_article(spanish):
     image = Image.objects.create(url='http://newest-culture-image.url')
     category = Category.objects.get(name='culture')
     return Article.objects.create(
         language=spanish,
-        title='Newest Culture Article',
-        excerpt='The excerpt',
-        media_title='The link title',
-        media_link='http://link.title',
+        title='Nuevo Artículo de cultura',
+        excerpt='El extracto',
+        media_title='El título del link',
+        media_link='http://link.titulo',
         category=category,
         publication_date='2020-12-14',
         image=image,
@@ -41,15 +62,15 @@ def newest_culture_article(spanish):
 
 
 @pytest.fixture
-def pixels_article(spanish):
+def spanish_pixels_article(spanish):
     category = Category.objects.get(name='pixels')
     image = Image.objects.create(url='http://pixels-image.url')
     return Article.objects.create(
         language=spanish,
-        title='Pixels Article',
-        excerpt='The excerpt',
-        media_title='The link title',
-        media_link='http://link.title',
+        title='Artículo de pixels',
+        excerpt='El extracto',
+        media_title='El título del link',
+        media_link='http://link.titulo',
         category=category,
         publication_date='2020-12-13',
         image=image,
@@ -57,15 +78,15 @@ def pixels_article(spanish):
 
 
 @pytest.fixture
-def newest_pixels_article(spanish):
+def newest_spanish_pixels_article(spanish):
     image = Image.objects.create(url='http://newest-pixels-image.url')
     category = Category.objects.get(name='pixels')
     return Article.objects.create(
         language=spanish,
-        title='Newest Pixels Article',
-        excerpt='The excerpt',
-        media_title='The link title',
-        media_link='http://link.title',
+        title='Nuevo Artículo de Pixels',
+        excerpt='El extracto',
+        media_title='El título del link',
+        media_link='http://link.titulo',
         category=category,
         publication_date='2020-12-14',
         image=image,
@@ -76,7 +97,12 @@ def newest_pixels_article(spanish):
 class TestArticlesView:
 
     @pytest.mark.usefixtures(
-        'culture_article', 'newest_culture_article', 'pixels_article', 'newest_pixels_article')
+        'english_culture_article',
+        'spanish_culture_article',
+        'newest_spanish_culture_article',
+        'spanish_pixels_article',
+        'newest_spanish_pixels_article'
+    )
     def test_returns_articles_grouped_by_category(self, client, settings, django_assert_num_queries):
         settings.LIST_ARTICLES_BY_CATEGORY = {
             'culture': 2,
@@ -84,24 +110,25 @@ class TestArticlesView:
             'interviews': 3,
         }
         with django_assert_num_queries(4):
-            response = client.get('/categories/')
+            headers = {'HTTP_X_LANGUAGE': 'es'}
+            response = client.get('/categories/', **headers)
 
         assert response.status_code == 200
         assert response.json() == {
             'culture': [
                 {
-                    'title': 'Newest Culture Article',
-                    'excerpt': 'The excerpt',
-                    'media_link': 'http://link.title',
-                    'media_title': 'The link title',
+                    'title': 'Nuevo Artículo de cultura',
+                    'excerpt': 'El extracto',
+                    'media_link': 'http://link.titulo',
+                    'media_title': 'El título del link',
                     'publication_date': '2020-12-14',
                     'image_url': 'http://newest-culture-image.url',
                 },
                 {
-                    'title': 'Culture Article',
-                    'excerpt': 'The excerpt',
-                    'media_link': 'http://link.title',
-                    'media_title': 'The link title',
+                    'title': 'Artículo de cultura',
+                    'excerpt': 'El extracto',
+                    'media_link': 'http://link.titulo',
+                    'media_title': 'El título del link',
                     'publication_date': '2020-12-13',
                     'image_url': 'http://culture-image.url'
                 }
@@ -109,36 +136,42 @@ class TestArticlesView:
             'interviews': [],
             'pixels': [
                 {
-                    'title': 'Newest Pixels Article',
-                    'excerpt': 'The excerpt',
-                    'media_link': 'http://link.title',
-                    'media_title': 'The link title',
+                    'title': 'Nuevo Artículo de Pixels',
+                    'excerpt': 'El extracto',
+                    'media_link': 'http://link.titulo',
+                    'media_title': 'El título del link',
                     'publication_date': '2020-12-14',
                     'image_url': 'http://newest-pixels-image.url'
                 }
             ]
         }
 
-    @pytest.mark.usefixtures('culture_article', 'pixels_article', 'newest_culture_article')
+    @pytest.mark.usefixtures(
+        'english_culture_article',
+        'spanish_culture_article',
+        'spanish_pixels_article',
+        'newest_spanish_culture_article'
+    )
     def test_returns_articles_for_a_category(self, client, django_assert_num_queries):
         with django_assert_num_queries(2):
-            response = client.get('/categories/culture/')
+            headers = {'HTTP_X_LANGUAGE': 'es'}
+            response = client.get('/categories/culture/', **headers)
 
         assert response.status_code == 200
         assert response.json() == [
                 {
-                    'title': 'Newest Culture Article',
-                    'excerpt': 'The excerpt',
-                    'media_link': 'http://link.title',
-                    'media_title': 'The link title',
+                    'title': 'Nuevo Artículo de cultura',
+                    'excerpt': 'El extracto',
+                    'media_link': 'http://link.titulo',
+                    'media_title': 'El título del link',
                     'publication_date': '2020-12-14',
                     'image_url': 'http://newest-culture-image.url',
                 },
                 {
-                    'title': 'Culture Article',
-                    'excerpt': 'The excerpt',
-                    'media_link': 'http://link.title',
-                    'media_title': 'The link title',
+                    'title': 'Artículo de cultura',
+                    'excerpt': 'El extracto',
+                    'media_link': 'http://link.titulo',
+                    'media_title': 'El título del link',
                     'publication_date': '2020-12-13',
                     'image_url': 'http://culture-image.url',
                 }
