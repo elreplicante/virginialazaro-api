@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'a-secret-key')
 DEBUG = True
@@ -31,6 +33,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'virginialazaro.urls'
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-language',
+]
 
 TEMPLATES = [
     {
