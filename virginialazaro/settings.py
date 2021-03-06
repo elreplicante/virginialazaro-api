@@ -29,6 +29,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'vlapi.middleware.LanguageMiddleware',
 ]
 
 ROOT_URLCONF = 'virginialazaro.urls'

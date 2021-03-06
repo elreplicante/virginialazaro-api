@@ -88,7 +88,7 @@ def newest_spanish_pixels_article(spanish):
         media_title='El título del link',
         media_link='http://link.titulo',
         category=category,
-        publication_date='2020-12-14',
+        publication_date='2020-12-15',
         image=image,
     )
 
@@ -123,6 +123,7 @@ class TestArticlesView:
                     'media_title': 'El título del link',
                     'publication_date': '2020-12-14',
                     'image_url': 'http://newest-culture-image.url',
+                    'category': 'culture',
                 },
                 {
                     'title': 'Artículo de cultura',
@@ -130,7 +131,8 @@ class TestArticlesView:
                     'media_link': 'http://link.titulo',
                     'media_title': 'El título del link',
                     'publication_date': '2020-12-13',
-                    'image_url': 'http://culture-image.url'
+                    'image_url': 'http://culture-image.url',
+                    'category': 'culture',
                 }
             ],
             'interviews': [],
@@ -140,8 +142,9 @@ class TestArticlesView:
                     'excerpt': 'El extracto',
                     'media_link': 'http://link.titulo',
                     'media_title': 'El título del link',
-                    'publication_date': '2020-12-14',
-                    'image_url': 'http://newest-pixels-image.url'
+                    'publication_date': '2020-12-15',
+                    'image_url': 'http://newest-pixels-image.url',
+                    'category': 'pixels',
                 }
             ]
         }
@@ -166,6 +169,7 @@ class TestArticlesView:
                     'media_title': 'El título del link',
                     'publication_date': '2020-12-14',
                     'image_url': 'http://newest-culture-image.url',
+                    'category': 'culture',
                 },
                 {
                     'title': 'Artículo de cultura',
@@ -174,6 +178,62 @@ class TestArticlesView:
                     'media_title': 'El título del link',
                     'publication_date': '2020-12-13',
                     'image_url': 'http://culture-image.url',
+                    'category': 'culture',
                 }
             ]
 
+
+@pytest.mark.django_db
+class TestCategoryView:
+
+    @pytest.mark.usefixtures(
+        'english_culture_article',
+        'spanish_culture_article',
+        'spanish_pixels_article',
+        'newest_spanish_culture_article',
+        'newest_spanish_pixels_article'
+    )
+    def test_returns_all_articles_ordered_by_date(self, client, django_assert_num_queries):
+        headers = {'HTTP_X_LANGUAGE': 'es'}
+        with django_assert_num_queries(1):
+            response = client.get('/articles/', **headers)
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {
+                'title': 'Nuevo Artículo de Pixels',
+                'excerpt': 'El extracto',
+                'media_link': 'http://link.titulo',
+                'media_title': 'El título del link',
+                'publication_date': '2020-12-15',
+                'image_url': 'http://newest-pixels-image.url',
+                'category': 'pixels',
+            },
+            {
+                'title': 'Nuevo Artículo de cultura',
+                'excerpt': 'El extracto',
+                'media_link': 'http://link.titulo',
+                'media_title': 'El título del link',
+                'publication_date': '2020-12-14',
+                'image_url': 'http://newest-culture-image.url',
+                'category': 'culture',
+            },
+            {
+                'title': 'Artículo de cultura',
+                'excerpt': 'El extracto',
+                'media_link': 'http://link.titulo',
+                'media_title': 'El título del link',
+                'publication_date': '2020-12-13',
+                'image_url': 'http://culture-image.url',
+                'category': 'culture',
+            },
+            {
+                'title': 'Artículo de pixels',
+                'excerpt': 'El extracto',
+                'media_link': 'http://link.titulo',
+                'media_title': 'El título del link',
+                'publication_date': '2020-12-13',
+                'image_url': 'http://pixels-image.url',
+                'category': 'pixels',
+            },
+        ]
