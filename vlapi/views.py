@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from django.db import connections
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -52,3 +53,13 @@ class ArticlesView(APIView):
         payload = ArticleSerializer(articles, many=True).data
 
         return Response(payload)
+
+
+class HealthCheckView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        connections['default'].ensure_connection()
+        if not connections['default'].is_usable():
+            return Response(data={'status': 'ko'}, status=status.HTTP_418_IM_A_TEAPOT)
+
+        return Response()

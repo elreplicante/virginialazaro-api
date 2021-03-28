@@ -1,4 +1,7 @@
+from unittest.mock import patch
+
 import pytest
+from django.db import connections
 
 from vlapi.models import Article, Category, Image, Language
 
@@ -237,3 +240,32 @@ class TestCategoryView:
                 'category': 'pixels',
             },
         ]
+
+
+@pytest.mark.django_db
+class TestSystemHealth:
+
+    @pytest.fixture
+    def default_db(self):
+        with patch.object(connections['default'], 'is_usable', return_value=True) as mock:
+            yield mock
+
+    @pytest.fixture
+    def default_db_error(self):
+        with patch.object(connections['default'], 'is_usable', return_value=False) as mock:
+            yield mock
+
+    @pytest.mark.usefixtures('default_db')
+    def test_returns_200_with_ok_status(self, client):
+        res = client.get('/health/')
+
+        assert res.status_code == 200
+
+    @pytest.mark.usefixtures('default_db_error')
+    def test_returns_teapot_status_and_ko_when_database_check_is_unsuccessful(self, client):
+        response = client.get('/health/')
+
+        assert response.status_code == 418
+        assert response.json() == {
+            'status': 'ko',
+        }
